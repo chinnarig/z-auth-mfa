@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
-import { QRCodeSVG } from 'qrcode.react'
 import { Shield, LogOut, Key, Download, CheckCircle, XCircle } from 'lucide-react'
 import { authAPI, usersAPI } from '@/lib/api'
 
@@ -205,21 +204,52 @@ export default function DashboardPage() {
                   {!backupCodes.length ? (
                     <>
                       <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm font-medium text-gray-900 mb-2">
-                          1. Scan this QR code with your authenticator app
+                        <p className="text-sm font-medium text-gray-900 mb-3">
+                          Step 1: Scan this QR code with your authenticator app
                         </p>
-                        <div className="flex justify-center my-4">
-                          <QRCodeSVG value={mfaData?.qr_code?.split(',')[1] || ''} size={200} />
+                        <p className="text-xs text-gray-600 mb-3">
+                          Works with: Microsoft Authenticator, Google Authenticator, Authy, 2FAS, and more
+                        </p>
+                        <div className="flex justify-center my-4 bg-white p-6 rounded-lg shadow-sm">
+                          {mfaData?.qr_code ? (
+                            <img 
+                              src={mfaData.qr_code} 
+                              alt="MFA QR Code" 
+                              className="w-72 h-72"
+                              style={{
+                                imageRendering: 'pixelated',
+                                maxWidth: '100%',
+                                height: 'auto'
+                              }}
+                            />
+                          ) : (
+                            <div className="w-72 h-72 bg-gray-200 flex items-center justify-center rounded">
+                              <div className="text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                                <p className="text-sm text-gray-600">Generating QR Code...</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <p className="text-xs text-gray-600 mb-2">Or enter this code manually:</p>
-                        <code className="block text-xs bg-white p-2 rounded border border-gray-200 text-center">
-                          {mfaData?.manual_entry_key}
-                        </code>
+                        
+                        <div className="border-t border-gray-300 my-4 pt-4">
+                          <p className="text-sm font-medium text-gray-900 mb-2">
+                            Can't scan? Enter this code manually:
+                          </p>
+                          <div className="bg-white p-3 rounded border border-gray-300">
+                            <code className="block text-sm text-center font-mono text-gray-900 select-all">
+                              {mfaData?.manual_entry_key}
+                            </code>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2 text-center">
+                            Remove spaces when entering manually
+                          </p>
+                        </div>
                       </div>
 
-                      <form onSubmit={handleEnableMFA}>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          2. Enter the 6-digit code from your app
+                      <form onSubmit={handleEnableMFA} className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Step 2: Enter the 6-digit code from your authenticator app
                         </label>
                         <input
                           type="text"
@@ -227,14 +257,17 @@ export default function DashboardPage() {
                           maxLength={6}
                           value={verificationCode}
                           onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-center text-lg tracking-widest"
+                          className="w-full px-3 py-3 border border-gray-300 rounded-md text-center text-2xl tracking-widest font-mono focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           placeholder="000000"
                           required
                         />
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          The code refreshes every 30 seconds
+                        </p>
                         <button
                           type="submit"
                           disabled={verificationCode.length !== 6}
-                          className="mt-4 w-full px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50"
+                          className="mt-4 w-full px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           Verify and Enable MFA
                         </button>

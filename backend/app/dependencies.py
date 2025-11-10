@@ -129,7 +129,7 @@ async def log_audit_event(
     request: Request,
     resource_type: Optional[str] = None,
     resource_id: Optional[UUID] = None,
-    metadata: Optional[dict] = None
+    extra_data: Optional[dict] = None
 ):
     """Log an audit event"""
     from app.models import AuditLog
@@ -149,7 +149,7 @@ async def log_audit_event(
         resource_id=resource_id,
         ip_address=ip_address,
         user_agent=user_agent,
-        metadata=json.dumps(metadata) if metadata else None
+        extra_data=json.dumps(extra_data) if extra_data else None
     )
     
     db.add(audit_log)
@@ -162,7 +162,7 @@ async def log_anonymous_audit_event(
     db: Session,
     request: Request,
     user_id: Optional[UUID] = None,
-    metadata: Optional[dict] = None
+    extra_data: Optional[dict] = None
 ):
     """Log an audit event without requiring authenticated user"""
     from app.models import AuditLog
@@ -176,7 +176,7 @@ async def log_anonymous_audit_event(
         action=action,
         ip_address=ip_address,
         user_agent=user_agent,
-        metadata=json.dumps(metadata) if metadata else None
+        extra_data=json.dumps(extra_data) if extra_data else None
     )
     
     db.add(audit_log)

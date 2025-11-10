@@ -11,8 +11,9 @@ SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SMTP_FROM = os.getenv("SMTP_FROM", "noreply@voiceagent.com")
-SMTP_TLS = os.getenv("SMTP_TLS", "True").lower() == "true"
+SMTP_SECURE = os.getenv("SMTP_SECURE", "false").lower() == "true"  # true for SSL (465), false for STARTTLS (587)
+FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@voiceagent.com")
+FROM_NAME = os.getenv("FROM_NAME", "Voice Age")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
@@ -28,7 +29,7 @@ async def send_email(
         return
     
     message = MIMEMultipart("alternative")
-    message["From"] = SMTP_FROM
+    message["From"] = f"{FROM_NAME} <{FROM_EMAIL}>"
     message["To"] = to_email
     message["Subject"] = subject
     
@@ -42,7 +43,18 @@ async def send_email(
     message.attach(html_part)
     
     try:
-        if SMTP_TLS:
+        if SMTP_SECURE:
+            # SSL/TLS connection (port 465)
+            await aiosmtplib.send(
+                message,
+                hostname=SMTP_HOST,
+                port=SMTP_PORT,
+                username=SMTP_USER,
+                password=SMTP_PASSWORD,
+                use_tls=True
+            )
+        else:
+            # STARTTLS connection (port 587)
             await aiosmtplib.send(
                 message,
                 hostname=SMTP_HOST,
@@ -51,14 +63,6 @@ async def send_email(
                 password=SMTP_PASSWORD,
                 start_tls=True
             )
-        else:
-            await aiosmtplib.send(
-                message,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USER,
-                password=SMTP_PASSWORD,
-            )
         print(f"✅ Email sent to {to_email}: {subject}")
     except Exception as e:
         print(f"❌ Failed to send email to {to_email}: {str(e)}")
@@ -66,7 +70,7 @@ async def send_email(
 
 async def send_welcome_email(to_email: str, full_name: str, company_name: str):
     """Send welcome email to new user"""
-    subject = f"Welcome to {company_name} Voice Agent Platform"
+    subject = f"Welcome to {company_name} - Zlavox AI Platform"
     
     html_content = f"""
     <!DOCTYPE html>
@@ -84,18 +88,18 @@ async def send_welcome_email(to_email: str, full_name: str, company_name: str):
     <body>
         <div class="container">
             <div class="header">
-                <h1>Welcome to Voice Agent Platform</h1>
+                <h1>Welcome to Zlavox AI</h1>
             </div>
             <div class="content">
                 <h2>Hello {full_name}!</h2>
-                <p>Welcome to <strong>{company_name}</strong> on Voice Agent Platform.</p>
-                <p>Your account has been successfully created. You can now access your dashboard and manage your voice agents.</p>
+                <p>Welcome to <strong>{company_name}</strong> on Zlavox AI Platform.</p>
+                <p>Your account has been successfully created. You can now access your dashboard and start using our platform.</p>
                 <p>For enhanced security, we strongly recommend enabling Multi-Factor Authentication (MFA) in your account settings.</p>
                 <a href="{FRONTEND_URL}/dashboard" class="button">Go to Dashboard</a>
                 <p>If you have any questions, please don't hesitate to contact our support team.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2025 Voice Agent Platform. All rights reserved.</p>
+                <p>&copy; 2025 Zlavox AI. All rights reserved.</p>
             </div>
         </div>
     </body>
@@ -103,11 +107,11 @@ async def send_welcome_email(to_email: str, full_name: str, company_name: str):
     """
     
     text_content = f"""
-    Welcome to Voice Agent Platform
+    Welcome to Zlavox AI Platform
     
     Hello {full_name}!
     
-    Welcome to {company_name} on Voice Agent Platform.
+    Welcome to {company_name} on Zlavox AI Platform.
     
     Your account has been successfully created. You can now access your dashboard at:
     {FRONTEND_URL}/dashboard
@@ -152,7 +156,7 @@ async def send_mfa_enabled_email(to_email: str, full_name: str):
                 <p>If you didn't enable MFA, please contact support immediately.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2025 Voice Agent Platform. All rights reserved.</p>
+                <p>&copy; 2025 Zlavox AI. All rights reserved.</p>
             </div>
         </div>
     </body>
@@ -210,7 +214,7 @@ async def send_login_notification(to_email: str, full_name: str, ip_address: str
                 <p>If you don't recognize this login, please secure your account immediately by changing your password.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2025 Voice Agent Platform. All rights reserved.</p>
+                <p>&copy; 2025 Zlavox AI. All rights reserved.</p>
             </div>
         </div>
     </body>

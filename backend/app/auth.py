@@ -56,8 +56,7 @@ def create_refresh_token(data: dict) -> tuple[str, datetime]:
     to_encode.update({
         "exp": expire,
         "iat": datetime.utcnow(),
-        "type": "refresh",
-        "jti": secrets.token_urlsafe(32)  # Unique token ID
+        "type": "refresh"
     })
     
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -98,20 +97,21 @@ def verify_token(token: str, token_type: str = "access") -> Dict:
 
 def create_mfa_pending_token(user_id: str, email: str, company_id: str, role: str) -> str:
     """Create a temporary token for MFA verification"""
-    data = {
+    expire = datetime.utcnow() + timedelta(minutes=5)  # Short-lived
+    
+    to_encode = {
         "sub": user_id,
         "email": email,
         "company_id": company_id,
         "role": role,
-        "mfa_required": True,
-        "type": "mfa_pending"
+        "exp": expire,
+        "iat": datetime.utcnow(),
+        "type": "access",
+        "mfa_required": True
     }
     
-    # MFA tokens expire in 5 minutes
-    expire = datetime.utcnow() + timedelta(minutes=5)
-    data["exp"] = expire
-    
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 
 def generate_backup_codes(count: int = 8) -> list[str]:
@@ -120,5 +120,7 @@ def generate_backup_codes(count: int = 8) -> list[str]:
     for _ in range(count):
         # Generate 8-character alphanumeric code
         code = secrets.token_hex(4).upper()
-        codes.append(f"{code[:4]}-{code[4:]}")
+        # Format as XXXX-XXXX for readability
+        formatted_code = f"{code[:4]}-{code[4:]}"
+        codes.append(formatted_code)
     return codes

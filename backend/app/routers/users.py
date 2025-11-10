@@ -196,7 +196,7 @@ async def delete_user(
         request=request,
         resource_type="user",
         resource_id=user.id,
-        metadata={"deleted_user_email": user.email}
+        extra_data={"deleted_user_email": user.email}
     )
     
     db.delete(user)

@@ -28,7 +28,7 @@ VALUES
         '11111111-1111-1111-1111-111111111112',
         '11111111-1111-1111-1111-111111111111',
         'admin@techcorp.com',
-        '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7YvkV4fZLq', -- SecurePass123!
+        '$2b$12$rw19vaSwWw6rO9DRMDOPXeO/Rom6e8x.7Ot2/TenFS.ApbAb0sVe.', -- SecurePass123!
         'Admin User',
         'admin',
         true,
@@ -41,7 +41,7 @@ VALUES
         '11111111-1111-1111-1111-111111111113',
         '11111111-1111-1111-1111-111111111111',
         'manager@techcorp.com',
-        '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7YvkV4fZLq', -- SecurePass123!
+        '$2b$12$rw19vaSwWw6rO9DRMDOPXeO/Rom6e8x.7Ot2/TenFS.ApbAb0sVe.', -- SecurePass123!
         'Manager User',
         'manager',
         true,
@@ -54,7 +54,7 @@ VALUES
         '11111111-1111-1111-1111-111111111114',
         '11111111-1111-1111-1111-111111111111',
         'user@techcorp.com',
-        '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7YvkV4fZLq', -- SecurePass123!
+        '$2b$12$rw19vaSwWw6rO9DRMDOPXeO/Rom6e8x.7Ot2/TenFS.ApbAb0sVe.', -- SecurePass123!
         'Regular User',
         'user',
         true,
@@ -81,7 +81,7 @@ VALUES
         '22222222-2222-2222-2222-222222222223',
         '22222222-2222-2222-2222-222222222222',
         'admin@startupxyz.com',
-        '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7YvkV4fZLq', -- SecurePass123!
+        '$2b$12$rw19vaSwWw6rO9DRMDOPXeO/Rom6e8x.7Ot2/TenFS.ApbAb0sVe.', -- SecurePass123!
         'Startup Admin',
         'admin',
         true,
@@ -94,7 +94,7 @@ VALUES
         '22222222-2222-2222-2222-222222222224',
         '22222222-2222-2222-2222-222222222222',
         'user@startupxyz.com',
-        '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7YvkV4fZLq', -- SecurePass123!
+        '$2b$12$rw19vaSwWw6rO9DRMDOPXeO/Rom6e8x.7Ot2/TenFS.ApbAb0sVe.', -- SecurePass123!
         'Startup User',
         'user',
         true,
@@ -108,7 +108,7 @@ ON CONFLICT (email) DO NOTHING;
 -- Sample Audit Logs
 -- ============================================
 
-INSERT INTO audit_logs (company_id, user_id, action, ip_address, metadata, created_at)
+INSERT INTO audit_logs (company_id, user_id, action, ip_address, extra_data, created_at)
 VALUES 
     (
         '11111111-1111-1111-1111-111111111111',

@@ -36,7 +36,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
-    role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
+    role = Column(Enum(UserRole, name='user_role', create_type=False, values_callable=lambda obj: [e.value for e in obj]), default=UserRole.USER, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
     
@@ -80,7 +80,7 @@ class AuditLog(Base):
     resource_id = Column(UUID(as_uuid=True), nullable=True)
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(Text, nullable=True)
-    metadata = Column(Text, nullable=True)  # JSON string for additional data
+    extra_data = Column(Text, nullable=True)  # JSON string for additional data
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships

@@ -4,7 +4,7 @@ from io import BytesIO
 import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import os
 from dotenv import load_dotenv
 import json
@@ -17,7 +17,7 @@ MFA_ISSUER_NAME = os.getenv("MFA_ISSUER_NAME", "VoiceAgent Platform")
 
 def get_encryption_key() -> bytes:
     """Derive encryption key from SECRET_KEY"""
-    kdf = PBKDF2(
+    kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
         salt=b'voice_agent_mfa_salt',  # In production, use a proper salt from env
@@ -49,30 +49,39 @@ def generate_mfa_secret() -> str:
 
 
 def get_totp_uri(secret: str, email: str) -> str:
-    """Generate provisioning URI for authenticator apps"""
+    """Generate provisioning URI for authenticator apps - compatible with all major apps"""
     totp = pyotp.TOTP(secret)
-    return totp.provisioning_uri(
+    
+    # Use email domain as issuer if available, otherwise use app name
+    issuer = MFA_ISSUER_NAME
+    
+    # Microsoft Authenticator prefers issuer in the label format
+    # Format: otpauth://totp/Issuer:user@example.com?secret=...&issuer=Issuer
+    uri = totp.provisioning_uri(
         name=email,
-        issuer_name=MFA_ISSUER_NAME
+        issuer_name=issuer
     )
+    
+    return uri
 
 
 def generate_qr_code(uri: str) -> str:
-    """Generate QR code image and return as base64 string"""
+    """Generate QR code image and return as base64 string - optimized for all authenticators"""
     qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,
-        border=4,
+        version=None,  # Auto-size based on data
+        error_correction=qrcode.constants.ERROR_CORRECT_M,  # Medium error correction
+        box_size=8,  # Smaller boxes for better scanning
+        border=2,  # Minimal border
     )
     qr.add_data(uri)
     qr.make(fit=True)
     
+    # Create high contrast image
     img = qr.make_image(fill_color="black", back_color="white")
     
-    # Convert to base64
+    # Convert to base64 with optimal size
     buffer = BytesIO()
-    img.save(buffer, format='PNG')
+    img.save(buffer, format='PNG', optimize=True)
     img_str = base64.b64encode(buffer.getvalue()).decode()
     
     return f"data:image/png;base64,{img_str}"

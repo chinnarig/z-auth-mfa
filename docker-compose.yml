@@ -4,11 +4,11 @@ services:
   # PostgreSQL Database
   db:
     image: postgres:16-alpine
-    container_name: voice_agent_db
+    container_name: mfa
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: voice_agent_db
+      POSTGRES_PASSWORD: Admin@011235
+      POSTGRES_DB: mfa
     ports:
       - "5432:5432"
     volumes:
@@ -30,7 +30,7 @@ services:
       dockerfile: Dockerfile
     container_name: voice_agent_backend
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/voice_agent_db
+      DATABASE_URL: postgresql://postgres:Admin%40011235@35.232.108.201:5432/mfa
       SECRET_KEY: ${SECRET_KEY:-your-super-secret-key-change-this-in-production}
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30

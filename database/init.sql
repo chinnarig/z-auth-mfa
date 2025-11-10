@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     resource_id UUID,
     ip_address VARCHAR(45),
     user_agent TEXT,
-    metadata TEXT,
+    extra_data TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

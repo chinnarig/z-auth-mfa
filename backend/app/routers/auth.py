@@ -82,7 +82,7 @@ async def register(
         db=db,
         request=request,
         user_id=user.id,
-        metadata={"email": user.email, "role": user.role.value}
+        extra_data={"email": user.email, "role": user.role.value}
     )
     
     # Send welcome email (async, don't wait)
@@ -182,7 +182,7 @@ async def login(
         db=db,
         request=request,
         user_id=user.id,
-        metadata={"email": user.email, "mfa_used": False}
+        extra_data={"email": user.email, "mfa_used": False}
     )
     
     # Send login notification (async, don't wait)
@@ -248,7 +248,7 @@ async def verify_mfa(
             db=db,
             request=request,
             user_id=user.id,
-            metadata={"email": user.email}
+            extra_data={"email": user.email}
         )
         
         raise HTTPException(
@@ -292,7 +292,7 @@ async def verify_mfa(
         db=db,
         request=request,
         user_id=user.id,
-        metadata={
+        extra_data={
             "email": user.email,
             "mfa_used": True,
             "backup_code_used": is_valid_backup
