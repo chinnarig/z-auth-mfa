@@ -55,6 +55,9 @@ async def register(
     company = Company(
         name=user_data.company_name,
         domain=user_data.company_domain,
+        address=user_data.company_address,
+        phone_number_1=user_data.company_phone_1,
+        phone_number_2=user_data.company_phone_2,
         is_active=True
     )
     db.add(company)

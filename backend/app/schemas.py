@@ -13,6 +13,9 @@ class UserRegister(BaseModel):
     full_name: str = Field(..., min_length=2, max_length=255)
     company_name: str = Field(..., min_length=2, max_length=255)
     company_domain: str = Field(..., min_length=2, max_length=255)
+    company_address: Optional[str] = None
+    company_phone_1: Optional[str] = None
+    company_phone_2: Optional[str] = None
 
     @validator('password')
     def validate_password(cls, v):
@@ -127,16 +130,29 @@ class UserResponse(BaseModel):
 class CompanyBase(BaseModel):
     name: str
     domain: str
+    address: Optional[str] = None
+    phone_number_1: Optional[str] = None
+    phone_number_2: Optional[str] = None
 
 
 class CompanyCreate(CompanyBase):
     pass
 
 
+class CompanyUpdate(BaseModel):
+    name: Optional[str] = None
+    domain: Optional[str] = None
+    address: Optional[str] = None
+    phone_number_1: Optional[str] = None
+    phone_number_2: Optional[str] = None
+
+
 class CompanyResponse(CompanyBase):
     id: UUID
+    api_key: Optional[str] = None
     is_active: bool
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
